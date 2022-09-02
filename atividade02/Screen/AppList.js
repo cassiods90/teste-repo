@@ -1,0 +1,56 @@
+import { StatusBar } from 'expo-status-bar';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import AppItem from '../components/AppItem';
+import { AsyncStorage } from 'react-native';
+
+
+export default function AppList({ route, navigation }) {
+    const [nomes, setNomes] = useState([]);
+    async function fetchData() {
+        const response = await AsyncStorage.getItem('nomes');
+        if (response) return JSON.parse(response);
+        return [];
+    }
+    useEffect(() => {
+        fetchData().then(items=>setNomes(items));
+    }, [route]);
+
+    return (
+        <View style={styles.container}>
+            <StatusBar style="light" />
+            <Text style={styles.title}>Lista de Convidados</Text>
+            <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.itemsContainer}>
+                {nomes.map(item => {
+                    return <AppItem key={item.id} id={item.id} nome={item.nome} sobrenome={item.sobrenome} navigation={navigation} />
+                })}
+            </ScrollView>
+        </View>
+    );
+}
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#036FFC',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    title: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginTop: 50,
+        marginBottom: 20
+    },
+    scrollContainer: {
+        flex: 1,
+        width: '90%'
+    },
+    itemsContainer: {
+        marginTop: 10,
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'stretch',
+        backgroundColor: '#fff'
+    },
+});
